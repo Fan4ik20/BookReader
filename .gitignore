@@ -1,0 +1,10 @@
+# Python
+venv
+__pycache__
+
+# IDEA
+.idea
+
+# Environment
+.env
+
