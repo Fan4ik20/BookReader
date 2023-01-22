@@ -22,5 +22,5 @@ class BookFile(ReaderBase):
     title: str = Column(String(100), nullable=False)
     author: str | None = Column(String(100))
 
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id: int = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     user: User = relationship(User, backref="books")

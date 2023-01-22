@@ -11,7 +11,10 @@ __all__ = ("UserRepositoryImp",)
 from domain.mappers import ModelMapper, UserMapper
 
 
-class UserRepositoryImp(AlchemyRepositoryBase[models.User, dto.UserCreate, dto.User, dto.UserUpdate], UserRepository):
+class UserRepositoryImp(
+    AlchemyRepositoryBase[models.User, dto.UserCreate, dto.User, dto.UserUpdate],
+    UserRepository,
+):
     def __init__(self, session: AsyncSession, mapper: ModelMapper = UserMapper()) -> None:
         super().__init__(session, mapper)
 
@@ -25,12 +28,11 @@ class UserRepositoryImp(AlchemyRepositoryBase[models.User, dto.UserCreate, dto.U
 
         return self._mapper.to_repr(user) if user else None
 
-    async def update(self, user_id: int, user: dto.UserUpdate) -> dto.User | None:
-        user_to_update = await self._session.get(models.User, user_id)
-        if not user_to_update:
-            return None
+    async def update(self, user_id: int, user: dto.UserUpdate) -> dto.User:
+        result = await self._session.scalars(select(models.User).filter_by(id=user_id))
+        user_to_update = result.one()
 
-        self._update_model(user_to_update, dto)
+        self._update_model(user_to_update, user)
 
         user_repr: dto.User = self._mapper.to_repr(user_to_update)
 
@@ -39,6 +41,12 @@ class UserRepositoryImp(AlchemyRepositoryBase[models.User, dto.UserCreate, dto.U
     async def delete(self, user_id: int) -> None:
         await self._session.execute(delete(models.User).filter_by(id=user_id))
 
-    async def create(self, user: dto.UserCreate) -> None:
+    async def create(self, user: dto.UserCreate) -> dto.User:
         user_to_create = self._mapper.to_model_create(user)
         self._session.add(user_to_create)
+
+        await self._session.flush(user_to_create)
+        await self._session.refresh(user_to_create)
+
+        user_dto: dto.User = self._mapper.to_repr(user_to_create)
+        return user_dto

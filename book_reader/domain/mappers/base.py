@@ -1,15 +1,14 @@
-from typing import Iterable, Protocol, TypeVar
+from typing import Generic, Iterable, TypeVar
 
 Model = TypeVar("Model")
 DTO = TypeVar("DTO")
 DTOCreate = TypeVar("DTOCreate")
-DTOUpdate = TypeVar("DTOUpdate")
 
 
 __all__ = ("ModelMapper",)
 
 
-class ModelMapper(Protocol[Model, DTOCreate, DTO]):
+class ModelMapper(Generic[Model, DTOCreate, DTO]):
     def to_repr_list(self, models: Iterable[Model]) -> list[DTO]:
         return [self.to_repr(model) for model in models]
 

@@ -12,11 +12,11 @@ class UserRepository(Protocol):
     async def get_by_username(self, username: str) -> dto.User | None:
         raise NotImplementedError
 
-    async def update(self, user_id: int, user: dto.UserUpdate) -> dto.User | None:
+    async def update(self, user_id: int, user: dto.UserUpdate) -> dto.User:
         raise NotImplementedError
 
     async def delete(self, user_id: int) -> None:
         raise NotImplementedError
 
-    async def create(self, user: dto.UserCreate) -> None:
+    async def create(self, user: dto.UserCreate) -> dto.User:
         raise NotImplementedError
